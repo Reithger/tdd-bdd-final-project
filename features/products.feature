@@ -18,6 +18,7 @@ Scenario: The server is running
 
 Scenario: Create a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Hammer"
     And I set the "Description" to "Claw hammer"
     And I select "True" in the "Available" dropdown
@@ -41,6 +42,7 @@ Scenario: Create a Product
 
 Scenario: Read a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Hat"
     And I press the "Search" button
     Then I should see the message "Success"
@@ -57,11 +59,12 @@ Scenario: Read a Product
 
 Scenario: Update a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Sheets"
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "87.00" in the "Price" field
-    When I set the "Price" to "64.00"
+    And I should see "Full bed sheets" in the "Description" field
+    When I set the "Description" to "100-ply Sheets"
     And I press the "Update" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -69,15 +72,16 @@ Scenario: Update a Product
     And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "Success"
-    And I should see "64.00" in the "Price" field
+    And I should see "100-ply Sheets" in the "Description" field
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "64.00" in the results
-    And I should not see "87.00" in the results
+    And I should see "100-ply Sheets" in the results
+    And I should not see "Full bed sheets" in the results
 
 Scenario: Delete a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Sheets"
     And I press the "Search" button
     Then I should see the message "Success"
