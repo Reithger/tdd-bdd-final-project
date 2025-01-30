@@ -28,6 +28,7 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
@@ -219,18 +220,77 @@ class TestProductRoutes(TestCase):
         # Setup numerous data
         test_products = self._create_products(10)
         self.assertEqual(10, self.get_product_count())
+        # Delete one product
         response = self.client.delete(BASE_URL + "/" + str(test_products[0].id))
         self.assertEqual(response.status_code, 204)
+        # Check that no data is returned and that the database has removed a product
         self.assertEqual(len(response.get_data()), 0)
         self.assertEqual(9, self.get_product_count())
 
     def test_list_all_products(self):
         """ It should Get a list of products """
+        # Setup products in the database
         self._create_products(5)
+        # Request the list of products from the database
         response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, 200)
+        # Check that the list of products has the correct length
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_list_by_name(self):
+        """ It should get a list of products with a specific name """
+        # Setup products in the database with local references
+        products = self._create_products(10)
+        # Get a default name to check in the database, count its occurences in case of dupes
+        name_ref = products[0].name
+        count = len([prod for prod in products if prod.name == name_ref])
+        # Query the database for all products that have a particular name
+        response = self.client.get(BASE_URL, query_string=f"name={quote_plus(name_ref)}")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        # Ensure that the returned data has as many product entries as was generated with that name
+        self.assertEqual(count, len(data))
+        # Ensure all the returned data has the correct name
+        for prod in data:
+            self.assertEqual(name_ref, prod["name"])
+
+    def test_list_by_category(self):
+        """ It should get a list of products with a specific category """
+        # Setup products in the database with local references
+        products = self._create_products(10)
+        # Get reference category from one of the products and count its occurence
+        category_ref = products[0].category
+        count = len([prod for prod in products if prod.category == category_ref])
+        # Make the query to the database using our category and ensure 200 status code
+        response = self.client.get(BASE_URL, query_string=f"category={str(category_ref.name)}")
+        self.assertEqual(response.status_code, 200)
+        # Acquire the data and test it returned the correct amount of products
+        data = response.get_json()
+        self.assertEqual(count, len(data))
+        # Ensure all the returned data has the correct category
+        for prod in data:
+            self.assertEqual(category_ref.name, prod["category"])
+
+    def test_list_by_availability(self):
+        """ It should get a list of products with a specific availability """
+        # Setup products in the database with local references
+        products = self._create_products(10)
+        # Get reference category from one of the products and count its occurence
+        availability_ref = products[0].available
+        use = "True"
+        if(availability_ref == False):
+            use = "False"
+        count = len([prod for prod in products if prod.available == availability_ref])
+        # Make the query to the database using our category and ensure 200 status code
+        response = self.client.get(BASE_URL, query_string=f"available={use}")
+        self.assertEqual(response.status_code, 200)
+        # Acquire the data and test it returned the correct amount of products
+        data = response.get_json()
+        self.assertEqual(count, len(data))
+        # Ensure all the returned data has the correct category
+        for prod in data:
+            self.assertEqual(availability_ref, prod["available"])
 
     ######################################################################
     # Utility functions
