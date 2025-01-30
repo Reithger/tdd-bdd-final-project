@@ -90,6 +90,7 @@ def create_products():
     # Uncomment this line of code once you implement READ A PRODUCT
     #
     location_url = url_for("get_products", product_id=product.id, _external=True)
+    location_url = "/"
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -102,7 +103,7 @@ def create_products():
 #
 
 @app.route("/products", methods=["GET"])
-def get_list_of_products():
+def get_products():
     """ Returns the list of all products in the database """
     ref_name = request.args.get("name")
     ref_category = request.args.get("category")
