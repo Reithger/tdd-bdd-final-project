@@ -61,7 +61,7 @@ Scenario: Update a Product
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "87.00" in the "Price" field
-    When I set the "Price" field to "64.00"
+    When I set the "Price" to "64.00"
     And I press the "Update" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -91,6 +91,43 @@ Scenario: Delete a Product
     And I press the "Search" button
     Then I should not see "Sheets" in the results
 
-Scnario: Listing all Products
+Scenario: Listing all Products
     When I visit the "Home Page"
-    
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Shoes" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Sheets" in the results
+
+Scenario: Search for a Product by Category
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "Food" in the "Category" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Big Mac" in the results
+    And I should not see "Sheets" in the results
+    And I should not see "Hat" in the results
+    And I should not see "Shoes" in the results
+
+Scenario: Search for a Product by Availability
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "True" in the "Available" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Sheets" in the results
+    And I should not see "Shoes" in the results
+
+Scenario: Search for a Product by Name
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Sheets"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Sheets" in the "Name" field
+    And I should see "Full bed sheets" in the "Description" field
