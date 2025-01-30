@@ -208,13 +208,29 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, 200)
         # Remove the product
         response = self.client.delete(BASE_URL + "/" + str(test_product.id))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         # Check that the product is not there
-        response = self.client.get(BASE_URL + "/" + str(test.product.id))
+        response = self.client.get(BASE_URL + "/" + str(test_product.id))
         self.assertEqual(response.status_code, 404)
         # Test failure case of deleting non-existent id
         response = self.client.delete(BASE_URL + "/999999")
         self.assertEqual(response.status_code, 404)
+
+        # Setup numerous data
+        test_products = self._create_products(10)
+        self.assertEqual(10, self.get_product_count())
+        response = self.client.delete(BASE_URL + "/" + str(test_products[0].id))
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(response.get_data()), 0)
+        self.assertEqual(9, self.get_product_count())
+
+    def test_list_all_products(self):
+        """ It should Get a list of products """
+        self._create_products(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
 
     ######################################################################
     # Utility functions
