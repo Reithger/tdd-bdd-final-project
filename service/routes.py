@@ -110,6 +110,15 @@ def create_products():
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
 
+@app.route("/products/<product_id>", methods=["GET"])
+def retrieve_product_by_id(product_id):
+    """ Retrieves a single product from the database by the specified product id """
+    product = Product.find(product_id)
+    if product is None:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' not found")
+    data = product.serialize()
+    return data, status.HTTP_200_OK
+
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
@@ -117,6 +126,22 @@ def create_products():
 #
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
+
+@app.route("/products/<product_id>", methods=["PUT"])
+def update_product(product_id):
+    """ Updates the product specified by product_id with new content """
+    data = request.get_json()
+    product = Product.find(product_id)
+    if product is None:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' not found")
+    product.name = data["name"]
+    product.price = data["price"]
+    product.description = data["description"]
+    product.category = data["category"]
+    product.available = data["available"]
+    product.update()
+    return product.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 # D E L E T E   A   P R O D U C T

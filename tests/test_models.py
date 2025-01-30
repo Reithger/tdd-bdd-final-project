@@ -10,7 +10,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 """
 Test cases for Product Model
@@ -187,7 +187,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(count, prods.count())
         for product in prods:
             self.assertEqual(product.available, available)
-        
+
     def test_find_by_category(self):
         """ Test to verify that find_by_category correctly works """
         add_products = ProductFactory.create_batch(10)
@@ -210,7 +210,7 @@ class TestProductModel(unittest.TestCase):
             found = False
             for ot_prod in find_product:
                 self.assertEqual(ot_prod.price, product.price)
-                if(ot_prod.id == product.id):
+                if ot_prod.id == product.id:
                     found = True
             self.assertTrue(found)
         str_product = ProductFactory()

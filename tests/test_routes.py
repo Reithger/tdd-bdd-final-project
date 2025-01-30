@@ -167,6 +167,55 @@ class TestProductRoutes(TestCase):
     # ADD YOUR TEST CASES HERE
     #
 
+    def test_read_a_product(self):
+        """ It should retrieve a product by its ID """
+        # Set up initial data in the database
+        test_product = self._create_products()[0]
+        # Query database for id of our test product
+        response = self.client.get(BASE_URL + "/" + str(test_product.id))
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_product.name)
+        # Test failure case of querying for non-existent product id
+        response = self.client.get(BASE_URL + "/999999")
+        self.assertEqual(response.status_code, 404)
+
+    def test_update_a_product(self):
+        """ It should update a product's contents by its ID reference """
+        # Set up initial data in the database
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, 201)
+        new_product = response.get_json()
+        # Update the product data we have locally for sending to the server
+        new_description = "New description"
+        new_product["description"] = new_description
+        # Make the put call to update the database
+        response = self.client.put(BASE_URL + "/" + str(new_product["id"]), json=new_product)
+        self.assertEqual(response.status_code, 200)
+        newest_product = response.get_json()
+        self.assertEqual(newest_product["description"], new_description)
+        # Test failure case of updating non-existent product
+        response = self.client.put(BASE_URL + "/99999", json=new_product)
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_product(self):
+        """ It should remove a product from the database specified by its ID """
+        # Set up initial data in the database
+        test_product = self._create_products()[0]
+        # Check that the product is there
+        response = self.client.get(BASE_URL + "/" + str(test_product.id))
+        self.assertEqual(response.status_code, 200)
+        # Remove the product
+        response = self.client.delete(BASE_URL + "/" + str(test_product.id))
+        self.assertEqual(response.status_code, 200)
+        # Check that the product is not there
+        response = self.client.get(BASE_URL + "/" + str(test.product.id))
+        self.assertEqual(response.status_code, 404)
+        # Test failure case of deleting non-existent id
+        response = self.client.delete(BASE_URL + "/999999")
+        self.assertEqual(response.status_code, 404)
+
     ######################################################################
     # Utility functions
     ######################################################################
